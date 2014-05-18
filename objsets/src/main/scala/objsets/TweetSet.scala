@@ -9,7 +9,7 @@ import TweetReader._
 class Tweet(val user: String, val text: String, val retweets: Int) {
   override def toString: String =
     "User: " + user + "\n" +
-    "Text: " + text + " [" + retweets + "]"
+      "Text: " + text + " [" + retweets + "]"
 }
 
 /**
@@ -42,7 +42,7 @@ abstract class TweetSet {
    * Question: Can we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def filter(p: Tweet => Boolean): TweetSet = ???
+  def filter(p: Tweet => Boolean): TweetSet = filterAcc(p, new Empty)
 
   /**
    * This is a helper method for `filter` that propagetes the accumulated tweets.
@@ -55,7 +55,7 @@ abstract class TweetSet {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-   def union(that: TweetSet): TweetSet = ???
+  def union(that: TweetSet): TweetSet = ???
 
   /**
    * Returns the tweet from this set which has the greatest retweet count.
@@ -68,6 +68,8 @@ abstract class TweetSet {
    */
   def mostRetweeted: Tweet = ???
 
+  def mostRetweetedAcc(acc: Tweet): Tweet = ???
+
   /**
    * Returns a list containing all tweets of this set, sorted by retweet count
    * in descending order. In other words, the head of the resulting list should
@@ -78,7 +80,6 @@ abstract class TweetSet {
    * and be implemented in the subclasses?
    */
   def descendingByRetweet: TweetList = ???
-
 
   /**
    * The following methods are already implemented
@@ -110,8 +111,17 @@ abstract class TweetSet {
 
 class Empty extends TweetSet {
 
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
+  override def union(that: TweetSet): TweetSet = that
+
+  override def mostRetweeted: Tweet = throw new java.util.NoSuchElementException
+
+  override def mostRetweetedAcc(acc: Tweet): Tweet = acc
+
+  override def descendingByRetweet: TweetList = Nil
+
+  def descendingByRetweetAcc(listAcc: TweetList, setAcc: TweetSet): TweetList = listAcc
 
   /**
    * The following methods are already implemented
@@ -124,12 +134,34 @@ class Empty extends TweetSet {
   def remove(tweet: Tweet): TweetSet = this
 
   def foreach(f: Tweet => Unit): Unit = ()
+
 }
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = ???
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = if (p(elem)) {
+    right.filterAcc(p, left.filterAcc(p, acc.incl(elem)))
+  } else {
+    right.filterAcc(p, left.filterAcc(p, acc))
+  }
 
+  override def union(that: TweetSet): TweetSet = ((left union right) union that) incl elem
+
+  override def mostRetweeted: Tweet = right.mostRetweetedAcc(left.mostRetweetedAcc(elem))
+
+  override def mostRetweetedAcc(acc: Tweet): Tweet = if (elem.retweets > acc.retweets) {
+    right.mostRetweetedAcc(left.mostRetweetedAcc(elem))
+  } else {
+    right.mostRetweetedAcc(left.mostRetweetedAcc(acc))
+  }
+
+  override def descendingByRetweet: TweetList = {
+    descendingByRetweetAcc(new Cons(this.mostRetweeted, Nil), this.remove(this.mostRetweeted))
+  }
+
+  def descendingByRetweetAcc(listAcc: TweetList, setAcc: TweetSet): TweetList = {
+    descendingByRetweetAcc(new Cons(listAcc.head,new Cons(setAcc.mostRetweetedAcc(setAcc.elem), Nil)), setAcc.remove(setAcc.mostRetweeted))
+  }
 
   /**
    * The following methods are already implemented
@@ -178,7 +210,6 @@ object Nil extends TweetList {
 class Cons(val head: Tweet, val tail: TweetList) extends TweetList {
   def isEmpty = false
 }
-
 
 object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")

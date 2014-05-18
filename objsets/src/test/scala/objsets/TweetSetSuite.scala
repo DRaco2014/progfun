@@ -16,6 +16,8 @@ class TweetSetSuite extends FunSuite {
     val set4c = set3.incl(c)
     val set4d = set3.incl(d)
     val set5 = set4c.incl(d)
+    val set6c = set1.incl(c)
+    val set6d = set6c.incl(d)
   }
 
   def asSet(tweets: TweetSet): Set[Tweet] = {
@@ -44,9 +46,33 @@ class TweetSetSuite extends FunSuite {
     }
   }
 
+  test("filter: should found nothing on non-empty set") {
+    new TestSets {
+      assert(size(set5.filter(tw => tw.user == "elmo")) === 0)
+    }
+  }
+
+  test("filter: should found something on non-root tweet") {
+    new TestSets {
+      assert(size(set5.filter(tw => tw.user == "b")) === 1)
+    }
+  }
+
   test("union: set4c and set4d") {
     new TestSets {
       assert(size(set4c.union(set4d)) === 4)
+    }
+  }
+
+  test("union: set4c and itself") {
+    new TestSets {
+      assert(size(set4c.union(set4c)) === 3)
+    }
+  }
+
+  test("union: empty set and itself") {
+    new TestSets {
+      assert(size(set1.union(set1)) === 0)
     }
   }
 
@@ -59,6 +85,27 @@ class TweetSetSuite extends FunSuite {
   test("union: with empty set (2)") {
     new TestSets {
       assert(size(set1.union(set5)) === 4)
+    }
+  }
+
+  test("mostRetweeted: with single element set") {
+    new TestSets {
+      assert(set2.mostRetweeted.user === "a")
+    }
+  }
+
+  test("mostRetweeted: with many elements set") {
+    new TestSets {
+      assert(set6d.mostRetweeted.user === "d")
+    }
+  }
+
+  test("mostRetweeted: with empty set") {
+    new TestSets {
+      intercept[java.util.NoSuchElementException] {
+        set1.mostRetweeted
+        fail("Should have thrown an exception")
+      }
     }
   }
 
