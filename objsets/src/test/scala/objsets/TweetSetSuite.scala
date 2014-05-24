@@ -18,6 +18,14 @@ class TweetSetSuite extends FunSuite {
     val set5 = set4c.incl(d)
     val set6c = set1.incl(c)
     val set6d = set6c.incl(d)
+
+    val one_el = Nil.append(new Tweet("e", "e body", 14))
+    val two_el = one_el.append(new Tweet("f", "f body", 17))
+    val three_el = two_el.append(new Tweet("g", "g body", 21))
+    
+    val tweetSets = set1.incl(new Tweet("John", "Scala is fun", 14)).incl(new Tweet("mark", "I agree with @Johh, Scala is awesome", 3)).incl(new Tweet("Amy", "What do you think about Scala", 21))
+    val keywords = List("Scala")
+
   }
 
   def asSet(tweets: TweetSet): Set[Tweet] = {
@@ -109,11 +117,55 @@ class TweetSetSuite extends FunSuite {
     }
   }
 
+  test("append: to an empty set") {
+    new TestSets {
+      assert(!one_el.isEmpty, "it should not be empty")
+      assert(one_el.head.user == "e", "head is incorrect")
+      assert(one_el.tail.isEmpty, "tail should be empty")
+    }
+  }
+
+  test("append: to an one element set") {
+    new TestSets {
+      assert(!two_el.isEmpty, "it should not be empty")
+      assert(two_el.head.user == "e", "head is incorrect")
+      assert(!two_el.tail.isEmpty, "tail should not be empty")
+      assert(two_el.tail.head.user == "f", "tail's head is incorrect")      
+    }
+  }
+  
+    test("append: to a two element set") {
+    new TestSets {
+      assert(!three_el.isEmpty, "it should not be empty")
+      assert(three_el.head.user == "e", "head is incorrect")
+      assert(!three_el.tail.isEmpty, "tail should not be empty")
+      assert(three_el.tail.head.user == "f", "tail's head is incorrect")
+      assert(!three_el.tail.tail.isEmpty, "tail's tail should not be empty")
+      assert(three_el.tail.tail.head.user == "g", "tail's tail's head is incorrect")
+    }
+  }
+
   test("descending: set5") {
     new TestSets {
       val trends = set5.descendingByRetweet
-      assert(!trends.isEmpty)
-      assert(trends.head.user == "a" || trends.head.user == "b")
+      assert(!trends.isEmpty, "sorted list should not be empty")
+      assert(trends.head.user == "a" || trends.head.user == "b", "1st is wrong")
+      assert(trends.tail.head.user == "a" || trends.tail.head.user == "b", "2nd is wrong")
+      assert(trends.tail.tail.head.user == "d", "3rd is wrong")
+      assert(trends.tail.tail.tail.head.user == "c", "4th is wrong")
+
     }
   }
+  
+    test("filtering: on 3-element TweetSet and one keyword") {
+    new TestSets {
+      val scalaTweets = tweetSets.filter(t => keywords.exists(s => t.text.contains(s)))
+      val trending = scalaTweets.descendingByRetweet
+      assert(!trending.isEmpty,"it should not be empty")            
+      assert(trending.head.user == "Amy","Head element is incorect")
+      assert(!trending.tail.isEmpty,"tail should not be empty")
+      assert(trending.tail.head.user == "John","Tail's Head element is incorect")
+    }
+  }
+    
 }
