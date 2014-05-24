@@ -82,6 +82,11 @@ abstract class TweetSet {
   def descendingByRetweet: TweetList = ???
 
   /**
+   * Tests if this `TweetSet` is empty.
+   */
+  def isEmpty(): Boolean
+
+  /**
    * The following methods are already implemented
    */
 
@@ -123,6 +128,8 @@ class Empty extends TweetSet {
 
   def descendingByRetweetAcc(listAcc: TweetList, setAcc: TweetSet): TweetList = listAcc
 
+  def isEmpty = true
+
   /**
    * The following methods are already implemented
    */
@@ -160,8 +167,14 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   }
 
   def descendingByRetweetAcc(listAcc: TweetList, setAcc: TweetSet): TweetList = {
-    descendingByRetweetAcc(new Cons(listAcc.head,new Cons(setAcc.mostRetweetedAcc(setAcc.elem), Nil)), setAcc.remove(setAcc.mostRetweeted))
+    if (!setAcc.isEmpty) {
+      descendingByRetweetAcc(new Cons(listAcc.head, new Cons(setAcc.mostRetweeted, Nil)), setAcc.remove(setAcc.mostRetweeted))
+    } else {
+      listAcc
+    }
   }
+
+  def isEmpty = false;
 
   /**
    * The following methods are already implemented
