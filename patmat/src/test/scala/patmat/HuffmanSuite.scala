@@ -14,6 +14,8 @@ class HuffmanSuite extends FunSuite {
     val t2 = Fork(Fork(Leaf('a', 2), Leaf('b', 3), List('a', 'b'), 5), Leaf('d', 4), List('a', 'b', 'd'), 9)
     val leaflist = List(Leaf('e', 1), Leaf('t', 2))
     val leaflist2 = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
+    
+    val simpleTable = List[(Char, List[Bit])](('e',List(0,0)),('t',List(0,1)),('x',List(1)))
   }
 
   test("weight of a smaller tree") {
@@ -123,6 +125,14 @@ class HuffmanSuite extends FunSuite {
   test("decode and encode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
+    }
+  }
+  
+  test("codeBits on simple table") {
+    new TestTrees {
+      assert(codeBits(simpleTable)('x')==List(1))
+      assert(codeBits(simpleTable)('e')==List(0,0))
+      assert(codeBits(simpleTable)('t')==List(0,1))
     }
   }
 }
