@@ -251,26 +251,26 @@ object Huffman {
 
     def encodeLoop(searchTree: CodeTree, text: List[Char], acc: List[Bit]): List[Bit] = text match {
       case List() => acc
-      case _ => 
+      case _ =>
         searchTree match {
-          case Leaf(c: Char, w: Int) => encodeLoop(tree,text.tail,acc)
+          case Leaf(c: Char, w: Int) => encodeLoop(tree, text.tail, acc)
           case Fork(left, right, chars, w) => {
-            if(go(left,text.head)) {
-              encodeLoop(left,text,acc ++ List(0))
-            } else if (go(right,text.head)) {
-              encodeLoop(right,text,acc ++ List(1))
+            if (go(left, text.head)) {
+              encodeLoop(left, text, acc ++ List(0))
+            } else if (go(right, text.head)) {
+              encodeLoop(right, text, acc ++ List(1))
             } else {
-               throw new java.util.NoSuchElementException
+              throw new java.util.NoSuchElementException
             }
-          }        
-      }
+          }
+        }
     }
-    
-    def go(t :CodeTree, k: Char): Boolean = t match {
-      case Leaf(cc: Char, ww: Int) => cc==k
-      case Fork(l,r,label,www) => label.contains(k)
-    } 
-    
+
+    def go(t: CodeTree, k: Char): Boolean = t match {
+      case Leaf(cc: Char, ww: Int) => cc == k
+      case Fork(l, r, label, www) => label.contains(k)
+    }
+
     text match {
       case List() => List()
       case _ => encodeLoop(tree, text, List())
@@ -287,7 +287,7 @@ object Huffman {
    */
   def codeBits(table: CodeTable)(char: Char): List[Bit] = table match {
     case List() => List()
-    case x :: xs => if(x._1 == char) x._2 else codeBits(xs)(char)
+    case x :: xs => if (x._1 == char) x._2 else codeBits(xs)(char)
   }
 
   /**
@@ -299,13 +299,13 @@ object Huffman {
    * sub-trees, think of how to build the code table for the entire tree.
    */
   def convert(tree: CodeTree): CodeTable = tree match {
-    case Leaf(c,w) => List()
-    case Fork(left,right,chars,w) => {
+    case Leaf(c, w) => List()
+    case Fork(left, right, chars, w) => {
       def convertLoop(searchTree: CodeTree, acc: List[Bit]): CodeTable = searchTree match {
-        case Leaf(cc,ww) => List((cc,acc))
-        case Fork(ll,rr,label,ww) => mergeCodeTables(convertLoop(ll,acc ++ List(0)), convertLoop(rr,acc ++ List(1)))
+        case Leaf(cc, ww) => List((cc, acc))
+        case Fork(ll, rr, label, ww) => mergeCodeTables(convertLoop(ll, acc ++ List(0)), convertLoop(rr, acc ++ List(1)))
       }
-      convertLoop(tree,List())
+      convertLoop(tree, List())
     }
   }
 
@@ -322,5 +322,15 @@ object Huffman {
    * To speed up the encoding process, it first converts the code tree to a code table
    * and then uses it to perform the actual encoding.
    */
-  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+
+    def encLoop(text: List[Char], acc: List[Bit]): List[Bit] = {
+      val table = convert(tree)
+      text match {
+        case List() => acc
+        case x :: xs => encLoop(xs, acc ++ (codeBits(table)(x)))
+      }
+    }
+    encLoop(text, List())
+  }
 }
