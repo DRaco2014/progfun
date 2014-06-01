@@ -111,8 +111,14 @@ class HuffmanSuite extends FunSuite {
   test("decode on simple tree"){
     val tree = createCodeTree(string2Chars("etxxtxx"))
     val code = List(1,0,0,0,1)
-    println(decode(tree,code))
     assert(decode(tree,code)==List('x','e','t'))
+  }
+  
+  test("encode on simple tree"){
+    val tree = createCodeTree(string2Chars("etxxtxx"))
+    val msg = List('x','e','t')
+    println(encode(tree)(msg))
+    assert(encode(tree)(msg)==List(1,0,0,0,1))
   }
 
   test("decode and encode a very short text should be identity") {

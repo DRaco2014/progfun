@@ -192,7 +192,7 @@ object Huffman {
    * The parameter `chars` is an arbitrary text. This function extracts the character
    * frequencies from that text and creates a code tree based on them.
    */
-  def createCodeTree(chars: List[Char]): CodeTree = until(singleton,combine)(makeOrderedLeafList(times(chars))).head
+  def createCodeTree(chars: List[Char]): CodeTree = until(singleton, combine)(makeOrderedLeafList(times(chars))).head
 
   // Part 3: Decoding
 
@@ -202,17 +202,25 @@ object Huffman {
    * This function decodes the bit sequence `bits` using the code tree `tree` and returns
    * the resulting list of characters.
    */
-  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = bits match {
-    case List() => List()
-    case x::xs => tree match {
-      	case Leaf(c,weight) => c::decode(tree,xs)  
-    	case Fork(left,right,chars,weight) => if(x==0){
-    	  decode(left,xs)
-    	} else {
-    	  decode(right,xs)
-    	}
+  def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
+
+    def decodeLoop(searchTree: CodeTree, bits: List[Bit], acc: List[Char]): List[Char] = searchTree match {
+      case Leaf(c, weight) => if (bits.isEmpty) acc ++ List(c) else decodeLoop(tree, bits, acc ++ List(c))
+      case Fork(left, right, chars, weight) => bits match {
+        case List() => acc
+        case x :: xs => if (x == 0) {
+          decodeLoop(left, xs, acc)
+        } else {
+          decodeLoop(right, xs, acc)
+        }
+      }
     }
-    
+
+    bits match {
+      case List() => List()
+      case _ =>
+        decodeLoop(tree, bits, List())
+    }
   }
 
   /**
@@ -231,7 +239,7 @@ object Huffman {
   /**
    * Write a function that returns the decoded secret
    */
-  def decodedSecret: List[Char] = decode(frenchCode,secret)
+  def decodedSecret: List[Char] = decode(frenchCode, secret)
 
   // Part 4a: Encoding using Huffman tree
 
@@ -239,7 +247,25 @@ object Huffman {
    * This function encodes `text` using the code tree `tree`
    * into a sequence of bits.
    */
-  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
+  def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
+
+    def encodeLoop(searchTree: CodeTree, text: List[Char], acc: List[Bit]): List[Bit] = searchTree match {
+      case Leaf(c, weight) => if (!text.isEmpty) {
+        if (c == text.head) {
+          encodeLoop(tree, text.tail, acc)
+        } else {
+          encodeLoop(tree, text, acc) //error?
+        }
+      } else acc
+      case Fork(left, right, chars, weight) => {
+        List()
+      }
+    }
+    text match {
+      case List() => List()
+      case _ => encodeLoop(tree, text, List())
+    }
+  }
 
   // Part 4b: Encoding using code table
 
