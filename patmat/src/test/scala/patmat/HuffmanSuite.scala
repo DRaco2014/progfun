@@ -14,8 +14,8 @@ class HuffmanSuite extends FunSuite {
     val t2 = Fork(Fork(Leaf('a', 2), Leaf('b', 3), List('a', 'b'), 5), Leaf('d', 4), List('a', 'b', 'd'), 9)
     val leaflist = List(Leaf('e', 1), Leaf('t', 2))
     val leaflist2 = List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 4))
-    
-    val simpleTable = List[(Char, List[Bit])](('e',List(0,0)),('t',List(0,1)),('x',List(1)))
+    val tree = createCodeTree(string2Chars("etxxtxx"))
+    val simpleTable = List[(Char, List[Bit])](('e', List(0, 0)), ('t', List(0, 1)), ('x', List(1)))
   }
 
   test("weight of a smaller tree") {
@@ -73,7 +73,7 @@ class HuffmanSuite extends FunSuite {
       assert(!singleton(List(t1, t2)), " This list is not a singelton")
     }
   }
-  
+
   test("singleton on a one element list") {
     new TestTrees {
       assert(singleton(List(t1)), " This list is a singelton")
@@ -81,14 +81,14 @@ class HuffmanSuite extends FunSuite {
   }
 
   test("combine of simple two element list") {
-    new TestTrees{
-    assert(combine(leaflist) === List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3)))
+    new TestTrees {
+      assert(combine(leaflist) === List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3)))
     }
   }
 
   test("combine of some leaf list") {
-    new TestTrees{
-    assert(combine(leaflist2) === List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4)))
+    new TestTrees {
+      assert(combine(leaflist2) === List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4)))
     }
   }
 
@@ -97,29 +97,31 @@ class HuffmanSuite extends FunSuite {
       val trees = until(singleton, combine)(leaflist)
       assert(trees == List(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3)))
     }
-}
-  
+  }
+
   test("until on a bigger list") {
     new TestTrees {
       val trees = until(singleton, combine)(leaflist2)
-      assert(trees == List(Fork(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4),List('e','t','x'),7)))
+      assert(trees == List(Fork(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4), List('e', 't', 'x'), 7)))
     }
-}
-  test("createCodeTree on short string"){
-    val tree = createCodeTree(string2Chars("etxxtxx"))
-    assert(tree == Fork(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4),List('e','t','x'),7))
   }
-  
-  test("decode on simple tree"){
+  test("createCodeTree on short string") {
     val tree = createCodeTree(string2Chars("etxxtxx"))
-    val code = List(1,0,0,0,1)
-    assert(decode(tree,code)==List('x','e','t'))
+    assert(tree == Fork(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4), List('e', 't', 'x'), 7))
   }
-  
-  test("encode on simple tree"){
-    val tree = createCodeTree(string2Chars("etxxtxx"))
-    val msg = List('x','e','t')
-    assert(encode(tree)(msg)==List(1,0,0,0,1))
+
+  test("decode on simple tree") {
+    new TestTrees {
+      val code = List(1, 0, 0, 0, 1)
+      assert(decode(tree, code) == List('x', 'e', 't'))
+    }
+  }
+
+  test("encode on simple tree") {
+    new TestTrees {
+      val msg = List('x', 'e', 't')
+      assert(encode(tree)(msg) == List(1, 0, 0, 0, 1))
+    }
   }
 
   test("decode and encode a very short text should be identity") {
@@ -127,12 +129,34 @@ class HuffmanSuite extends FunSuite {
       assert(decode(t1, encode(t1)("ab".toList)) === "ab".toList)
     }
   }
-  
+
   test("codeBits on simple table") {
     new TestTrees {
-      assert(codeBits(simpleTable)('x')==List(1))
-      assert(codeBits(simpleTable)('e')==List(0,0))
-      assert(codeBits(simpleTable)('t')==List(0,1))
+      assert(codeBits(simpleTable)('x') == List(1),"Invalid code bit for x")
+      assert(codeBits(simpleTable)('e') == List(0, 0),"Invalid code bit for e")
+      assert(codeBits(simpleTable)('t') == List(0, 1),"Invalid code bit for t")
     }
   }
+  
+  test("convert on simple tree") {
+    new TestTrees {
+      val table = convert(tree)
+      assert(table == simpleTable,"invalid convertion")
+    }
+  }
+  
+  test("mergeCodeTables on two simple tables") {
+    val t1 = List[(Char, List[Bit])](('a',List(0)))
+    val t2 = List[(Char, List[Bit])](('b',List(1)))
+    assert(mergeCodeTables(t1, t2) == List[(Char, List[Bit])](('a',List(0)), ('b',List(1))))
+  }
+  
+  
+  test("decode and quickEncode a very short text should be identity") {
+    new TestTrees {
+      assert(decode(t1, quickEncode(t1)("ab".toList)) === "ab".toList)
+    }
+  }
+  
+  
 }
