@@ -249,18 +249,28 @@ object Huffman {
    */
   def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
 
-    def encodeLoop(searchTree: CodeTree, text: List[Char], acc: List[Bit]): List[Bit] = searchTree match {
-      case Leaf(c, weight) => if (!text.isEmpty) {
-        if (c == text.head) {
-          encodeLoop(tree, text.tail, acc)
-        } else {
-          encodeLoop(tree, text, acc) //error?
-        }
-      } else acc
-      case Fork(left, right, chars, weight) => {
-        List()
+    def encodeLoop(searchTree: CodeTree, text: List[Char], acc: List[Bit]): List[Bit] = text match {
+      case List() => acc
+      case _ => 
+        searchTree match {
+          case Leaf(c: Char, w: Int) => encodeLoop(tree,text.tail,acc)
+          case Fork(left, right, chars, w) => {
+            if(go(left,text.head)) {
+              encodeLoop(left,text,acc ++ List(0))
+            } else if (go(right,text.head)) {
+              encodeLoop(right,text,acc ++ List(1))
+            } else {
+               throw new java.util.NoSuchElementException
+            }
+          }        
       }
     }
+    
+    def go(t :CodeTree, k: Char): Boolean = t match {
+      case Leaf(cc: Char, ww: Int) => cc==k
+      case Fork(l,r,label,www) => label.contains(k)
+    } 
+    
     text match {
       case List() => List()
       case _ => encodeLoop(tree, text, List())

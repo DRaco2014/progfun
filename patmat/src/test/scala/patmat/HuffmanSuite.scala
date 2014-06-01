@@ -117,7 +117,6 @@ class HuffmanSuite extends FunSuite {
   test("encode on simple tree"){
     val tree = createCodeTree(string2Chars("etxxtxx"))
     val msg = List('x','e','t')
-    println(encode(tree)(msg))
     assert(encode(tree)(msg)==List(1,0,0,0,1))
   }
 
