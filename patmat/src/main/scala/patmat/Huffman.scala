@@ -105,15 +105,15 @@ object Huffman {
    */
   def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs match {
     case List() => List()
-    case x :: xs => orderLeafs(x, xs)
+    case x :: xs => orderLeafs(Leaf(x._1, x._2), makeOrderedLeafList(xs))
   }
 
-  private def orderLeafs(y: (Char, Int), freqs: List[(Char, Int)]): List[Leaf] = freqs match {
-    case List() => List(Leaf(y._1, y._2))
-    case x :: xs => if (x._2 < y._2) {
-      Leaf(x._1, x._2) :: orderLeafs(y, xs)
+  private def orderLeafs(y: Leaf, freqs: List[Leaf]): List[Leaf] = freqs match {
+    case List() => List(y)
+    case x :: xs => if (x.weight < y.weight) {
+      x :: orderLeafs(y, xs)
     } else {
-      Leaf(y._1, y._2) :: orderLeafs(x, xs)
+      y :: orderLeafs(x, xs)
     }
   }
 
@@ -155,6 +155,7 @@ object Huffman {
     } else {
       x :: insert(y, ys)
     }
+
   }
 
   /**
@@ -257,22 +258,20 @@ object Huffman {
           case Fork(left, right, chars, w) => {
             if (go(left, text.head)) {
               encodeLoop(left, text, acc ++ List(0))
-            } else if (go(right, text.head)) {
+            } else {//it's not in the left so it must be in the right
               encodeLoop(right, text, acc ++ List(1))
-            } else {
-              throw new java.util.NoSuchElementException
             }
           }
         }
     }
 
+    //is it right way to go? checks if this tree contains given char
     def go(t: CodeTree, k: Char): Boolean = t match {
       case Leaf(cc: Char, ww: Int) => cc == k
       case Fork(l, r, label, www) => label.contains(k)
     }
 
     text match {
-      case List() => List()
       case _ => encodeLoop(tree, text, List())
     }
   }

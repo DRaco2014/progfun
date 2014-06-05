@@ -64,6 +64,12 @@ class HuffmanSuite extends FunSuite {
     assert(makeOrderedLeafList(List(('t', 2), ('e', 1), ('x', 3))) === List(Leaf('e', 1), Leaf('t', 2), Leaf('x', 3)))
   }
 
+  test("makeOrderedLeafList for long frequency table") {
+    val longList = List(('H', 1), ('u', 1), ('f', 2), ('m', 1), ('a', 1), ('n', 1), (' ', 2), ('e', 1), ('s', 1), ('t', 1), ('c', 1), ('o', 2), ('l', 1))
+    val result = List(Leaf('H', 1), Leaf('u', 1), Leaf('m', 1), Leaf('a', 1), Leaf('n', 1), Leaf('e', 1), Leaf('s', 1), Leaf('t', 1), Leaf('c', 1), Leaf('l', 1), Leaf('f', 2), Leaf(' ', 2), Leaf('o', 2))
+    assert(makeOrderedLeafList(longList) === result)
+  }
+
   test("singleton on an empty list") {
     assert(!singleton(List()), " Empty list is not a singelton")
   }
@@ -110,6 +116,17 @@ class HuffmanSuite extends FunSuite {
     assert(tree == Fork(Fork(Leaf('e', 1), Leaf('t', 2), List('e', 't'), 3), Leaf('x', 4), List('e', 't', 'x'), 7))
   }
 
+  test("createCodeTree efficiency") {
+    testCodeTreeEfficiency("someText", 22)
+    testCodeTreeEfficiency("Huffman est cool", 58)
+    testCodeTreeEfficiency("Huffman coding is a compression algorithm that can be used to compress lists of characters.", 373)
+  }
+
+  private def testCodeTreeEfficiency(text: String, length: Int) {
+    val someTextCodeTree = createCodeTree(text.toList)
+    assert(encode(someTextCodeTree)(text.toList).length === length)
+  }
+
   test("decode on simple tree") {
     new TestTrees {
       val code = List(1, 0, 0, 0, 1)
@@ -132,31 +149,29 @@ class HuffmanSuite extends FunSuite {
 
   test("codeBits on simple table") {
     new TestTrees {
-      assert(codeBits(simpleTable)('x') == List(1),"Invalid code bit for x")
-      assert(codeBits(simpleTable)('e') == List(0, 0),"Invalid code bit for e")
-      assert(codeBits(simpleTable)('t') == List(0, 1),"Invalid code bit for t")
+      assert(codeBits(simpleTable)('x') == List(1), "Invalid code bit for x")
+      assert(codeBits(simpleTable)('e') == List(0, 0), "Invalid code bit for e")
+      assert(codeBits(simpleTable)('t') == List(0, 1), "Invalid code bit for t")
     }
   }
-  
+
   test("convert on simple tree") {
     new TestTrees {
       val table = convert(tree)
-      assert(table == simpleTable,"invalid convertion")
+      assert(table == simpleTable, "invalid convertion")
     }
   }
-  
+
   test("mergeCodeTables on two simple tables") {
-    val t1 = List[(Char, List[Bit])](('a',List(0)))
-    val t2 = List[(Char, List[Bit])](('b',List(1)))
-    assert(mergeCodeTables(t1, t2) == List[(Char, List[Bit])](('a',List(0)), ('b',List(1))))
+    val t1 = List[(Char, List[Bit])](('a', List(0)))
+    val t2 = List[(Char, List[Bit])](('b', List(1)))
+    assert(mergeCodeTables(t1, t2) == List[(Char, List[Bit])](('a', List(0)), ('b', List(1))))
   }
-  
-  
+
   test("decode and quickEncode a very short text should be identity") {
     new TestTrees {
       assert(decode(t1, quickEncode(t1)("ab".toList)) === "ab".toList)
     }
   }
-  
-  
+
 }
