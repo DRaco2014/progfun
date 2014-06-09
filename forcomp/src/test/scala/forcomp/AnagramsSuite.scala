@@ -17,8 +17,14 @@ class AnagramsSuite extends FunSuite {
   test("wordOccurrences: Robert") {
     assert(wordOccurrences("Robert") === List(('b', 1), ('e', 1), ('o', 1), ('r', 2), ('t', 1)))
   }
+  
+  test("wordOccurrences: married") {
+    assert(wordOccurrences("married") === List(('a', 1), ('d',1), ('e', 1),('i', 1),('m', 1),('r', 2)))
+  }
 
-
+test("wordOccurrences: empty String") {
+    assert(wordOccurrences("") === List())
+  }
 
   test("sentenceOccurrences: abcd e") {
     assert(sentenceOccurrences(List("abcd", "e")) === List(('a', 1), ('b', 1), ('c', 1), ('d', 1), ('e', 1)))
@@ -28,6 +34,10 @@ class AnagramsSuite extends FunSuite {
 
   test("dictionaryByOccurrences.get: eat") {
     assert(dictionaryByOccurrences.get(List(('a', 1), ('e', 1), ('t', 1))).map(_.toSet) === Some(Set("ate", "eat", "tea")))
+  }
+  
+  test("dictionaryByOccurrences.get: married") {
+    assert(dictionaryByOccurrences.get(List(('a', 1), ('d',1), ('e', 1),('i', 1),('m', 1),('r', 2))).map(_.toSet) === Some(Set("married", "admirer")))
   }
 
 
