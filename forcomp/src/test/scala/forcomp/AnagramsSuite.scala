@@ -82,6 +82,17 @@ test("wordOccurrences: empty String") {
   }
 
 
+  test("combinations: abc") {
+    val abc = List(('a', 1), ('b', 1),('c',1))
+    val abccomb = List(
+      List(),
+      List(('a', 1)),List(('b', 1)),List(('c', 1)),
+      List(('a', 1),('b', 1)),List(('a', 1),('c', 1)),List(('b', 1),('c', 1)),
+      List(('a', 1),('b', 1),('c', 1))
+    )
+    assert(combinations(abc).toSet === abccomb.toSet)
+  }  
+  
 
   test("sentence anagrams: []") {
     val sentence = List()

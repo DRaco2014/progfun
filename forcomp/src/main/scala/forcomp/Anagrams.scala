@@ -97,7 +97,44 @@ object Anagrams {
    *  Note that the order of the occurrence list subsets does not matter -- the subsets
    *  in the example above could have been displayed in some other order.
    */
-  def combinations(occurrences: Occurrences): List[Occurrences] = ???
+  def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
+    case Nil => List(Nil)
+    case _ => {
+      val simples: List[(Char, Int)] = List() ++ generateSimples(occurrences)
+      (simples.map(x => List(x)) ++ combine(simples) ++ List(Nil))
+      }    
+  }
+  
+  
+  private def generateSimples(occurences: List[(Char, Int)]): List[(Char, Int)] = {
+    for {
+      (k, occ) <- occurences
+      i <- 1 to occ
+    } yield (k, i)    
+  }
+  
+  private def generateSimple(occurence: (Char, Int)): List[(Char, Int)] = {
+    (for {      
+      i <- (1 to occurence._2)
+    } yield (occurence._1, i)).toList    
+  }
+  
+  def combine(occurences: List[(Char, Int)]): List[List[(Char, Int)]] = {
+    for {
+      (k, occ) <- occurences
+      (l, occ2) <- occurences
+      if k < l
+    } yield List((k, occ),(l, occ2))
+  }
+  
+  /**
+   * merges two lists of lists of (Char,Int) by concatenating them and adding combinations of elements from ListA with elements from listB   
+   * */
+  def merge(listA: List[List[(Char,Int)]],listB: List[List[(Char,Int)]]): List[List[(Char,Int)]] = listA match{
+  	case Nil => listB ++ List(Nil)
+  	case x :: Nil => listB.map(y => y ++ x) ++ listB ++ List(x) ++ List(Nil)
+  	case x :: xs => listB.map(y => y ++ x) ++ merge(xs, listB)++ listB ++ List(x) ++ List(Nil)
+  }    
 
   /**
    * Subtracts occurrence list `y` from occurrence list `x`.
