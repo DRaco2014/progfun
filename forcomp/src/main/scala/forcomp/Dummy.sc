@@ -6,25 +6,26 @@ object Dummy {
 
   val occurences = List(('a', 2), ('b', 2), ('c', 2))
                                                   //> occurences  : List[(Char, Int)] = List((a,2), (b,2), (c,2))
-  val abc = List(('a', 1), ('b', 1), ('c', 1))    //> abc  : List[(Char, Int)] = List((a,1), (b,1), (c,1))
+  val abc = List(('a', 2), ('b', 3), ('c', 1))    //> abc  : List[(Char, Int)] = List((a,2), (b,3), (c,1))
 
   def generateSimples(occurences3: List[(Char, Int)]): List[List[(Char, Int)]] = {
     (for {
       (k, occ) <- occurences3
       i <- 1 to occ
-    } yield (k, i)).map(x => List(x))
+    } yield List((k, i)) ) ++ List(Nil)
   }                                               //> generateSimples: (occurences3: List[(Char, Int)])List[List[(Char, Int)]]
 
-  generateSimples(abc)                            //> res0: List[List[(Char, Int)]] = List(List((a,1)), List((b,1)), List((c,1)))
-                                                  //| 
+  generateSimples(abc)                            //> res0: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)), List((b,1)), 
+                                                  //| List((b,2)), List((b,3)), List((c,1)), List())
+generateSimples(List(('a',2)))                    //> res1: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)), List())
 
   def generateSimple(occurence: (Char, Int)): List[List[(Char, Int)]] = {
     (for {
       i <- (1 to occurence._2)
-    } yield List((occurence._1, i))).toList
+    } yield List((occurence._1, i))).toList ++ List(Nil)
   }                                               //> generateSimple: (occurence: (Char, Int))List[List[(Char, Int)]]
 
-  generateSimple(('a', 2))                        //> res1: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)))
+  generateSimple(('a', 2))                        //> res2: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)), List())
 
   def combine(occurences4: List[(Char, Int)]): List[List[(Char, Int)]] = {
     for {
@@ -34,8 +35,8 @@ object Dummy {
     } yield List((k, occ), (l, occ2))
   }                                               //> combine: (occurences4: List[(Char, Int)])List[List[(Char, Int)]]
 
-  combine(abc)                                    //> res2: List[List[(Char, Int)]] = List(List((a,1), (b,1)), List((a,1), (c,1)),
-                                                  //|  List((b,1), (c,1)))
+  combine(abc)                                    //> res3: List[List[(Char, Int)]] = List(List((a,2), (b,3)), List((a,2), (c,1)),
+                                                  //|  List((b,3), (c,1)))
 
   def simpleC(occurences: List[(Char, Int)]): List[(Char, Int)] = {
     for {
@@ -43,7 +44,7 @@ object Dummy {
       i <- 1 to occ
     } yield (k, i)
   }                                               //> simpleC: (occurences: List[(Char, Int)])List[(Char, Int)]
-  simpleC(occurences)                             //> res3: List[(Char, Int)] = List((a,1), (a,2), (b,1), (b,2), (c,1), (c,2))
+  simpleC(occurences)                             //> res4: List[(Char, Int)] = List((a,1), (a,2), (b,1), (b,2), (c,1), (c,2))
 
   def comb(occurrences2: List[(Char, Int)]): List[List[(Char, Int)]] = {
     val zero = List(Nil)
@@ -56,8 +57,8 @@ object Dummy {
     }
   }                                               //> comb: (occurrences2: List[(Char, Int)])List[List[(Char, Int)]]
 
-  comb(abc)                                       //> res4: List[List[(Char, Int)]] = List(List((a,1)), List((b,1)), List((c,1)),
-                                                  //|  List())
+  comb(abc)                                       //> res5: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)), List(), List
+                                                  //| ((b,1)), List((b,2)), List((b,3)), List(), List((c,1)), List(), List())
 
   def secondC(occurences: List[(Char, Int)]): List[List[(Char, Int)]] = {
     for {
@@ -67,7 +68,7 @@ object Dummy {
     } yield List((k, occ), (l, occ2))
   }                                               //> secondC: (occurences: List[(Char, Int)])List[List[(Char, Int)]]
 
-  secondC(simpleC(occurences))                    //> res5: List[List[(Char, Int)]] = List(List((a,1), (b,1)), List((a,1), (b,2))
+  secondC(simpleC(occurences))                    //> res6: List[List[(Char, Int)]] = List(List((a,1), (b,1)), List((a,1), (b,2))
                                                   //| , List((a,1), (c,1)), List((a,1), (c,2)), List((a,2), (b,1)), List((a,2), (
                                                   //| b,2)), List((a,2), (c,1)), List((a,2), (c,2)), List((b,1), (c,1)), List((b,
                                                   //| 1), (c,2)), List((b,2), (c,1)), List((b,2), (c,2)))
@@ -85,7 +86,7 @@ val ab = List(List(('a',1)),List(('b',1)),List(('a',1),('b',1)))
                                                   //| (b,1)))
 val c= List(List(('c',1)))                        //> c  : List[List[(Char, Int)]] = List(List((c,1)))
 
-merge(ab,c).toSet                                 //> res6: scala.collection.immutable.Set[List[(Char, Int)]] = Set(List((c,1)), 
+merge(ab,c).toSet                                 //> res7: scala.collection.immutable.Set[List[(Char, Int)]] = Set(List((c,1)), 
                                                   //| List((a,1)), List((b,1)), List((a,1), (b,1)), List(), List((c,1), (b,1)), L
                                                   //| ist((c,1), (a,1)), List((c,1), (a,1), (b,1)))
 

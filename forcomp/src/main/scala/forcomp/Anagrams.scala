@@ -99,42 +99,28 @@ object Anagrams {
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
     case Nil => List(Nil)
-    case _ => {
-      val simples: List[(Char, Int)] = List() ++ generateSimples(occurrences)
-      (simples.map(x => List(x)) ++ combine(simples) ++ List(Nil))
-      }    
-  }
-  
-  
-  private def generateSimples(occurences: List[(Char, Int)]): List[(Char, Int)] = {
-    for {
-      (k, occ) <- occurences
-      i <- 1 to occ
-    } yield (k, i)    
-  }
-  
-  private def generateSimple(occurence: (Char, Int)): List[(Char, Int)] = {
-    (for {      
-      i <- (1 to occurence._2)
-    } yield (occurence._1, i)).toList    
-  }
-  
-  def combine(occurences: List[(Char, Int)]): List[List[(Char, Int)]] = {
-    for {
-      (k, occ) <- occurences
-      (l, occ2) <- occurences
-      if k < l
-    } yield List((k, occ),(l, occ2))
+    case x :: xs => mergeAndCombine(generateSimple(x), combinations(xs)) 
   }
   
   /**
-   * merges two lists of lists of (Char,Int) by concatenating them and adding combinations of elements from ListA with elements from listB   
+   * generates 'simple' List of single letter combination up to number of occurrences
    * */
-  def merge(listA: List[List[(Char,Int)]],listB: List[List[(Char,Int)]]): List[List[(Char,Int)]] = listA match{
-  	case Nil => listB ++ List(Nil)
-  	case x :: Nil => listB.map(y => y ++ x) ++ listB ++ List(x) ++ List(Nil)
-  	case x :: xs => listB.map(y => y ++ x) ++ merge(xs, listB)++ listB ++ List(x) ++ List(Nil)
-  }    
+  def generateSimple(occurence: (Char, Int)): List[List[(Char, Int)]] = {
+    (for {
+      i <- (1 to occurence._2)
+    } yield List((occurence._1, i))).toList ++ List(Nil)
+  }
+  
+ 
+  /**
+   * merges two lists of lists of (Char,Int) by concatenating eachs of elements from ListA with each of elements from listB   
+   * */
+  def mergeAndCombine(listA: List[List[(Char,Int)]],listB: List[List[(Char,Int)]]): List[List[(Char,Int)]]= {
+    for {
+      b: List[(Char,Int)] <- listB
+      a: List[(Char,Int)] <- listA
+    } yield (b ++ a).sorted 
+  }
 
   /**
    * Subtracts occurrence list `y` from occurrence list `x`.
