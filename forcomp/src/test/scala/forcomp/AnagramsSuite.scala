@@ -13,6 +13,14 @@ class AnagramsSuite extends FunSuite {
   trait TestSets {
     //input
     val abc = List(('a', 1), ('b', 1), ('c', 1))
+    
+    val lard = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
+    val larda = List(('a', 2), ('d', 1), ('l', 1), ('r', 1))
+    val lad = List(('a', 1), ('d', 1), ('l', 1))
+    
+    val ab: List[List[(Char, Int)]] = List(List(('a', 1)), List(('b', 1)), List(('a', 1), ('b', 1)),List())
+    val c: List[List[(Char, Int)]] = List(List(('c', 1)),List())
+    
     //output
     val abccomb = List(
       List(),
@@ -20,8 +28,7 @@ class AnagramsSuite extends FunSuite {
       List(('a', 1), ('b', 1)), List(('a', 1), ('c', 1)), List(('b', 1), ('c', 1)),
       List(('a', 1), ('b', 1), ('c', 1)))
 
-    val ab: List[List[(Char, Int)]] = List(List(('a', 1)), List(('b', 1)), List(('a', 1), ('b', 1)),List())
-    val c: List[List[(Char, Int)]] = List(List(('c', 1)),List())
+    
   }
   test("wordOccurrences: abcd") {
     assert(wordOccurrences("abcd") === List(('a', 1), ('b', 1), ('c', 1), ('d', 1)))
@@ -101,6 +108,28 @@ class AnagramsSuite extends FunSuite {
     val r = List(('r', 1))
     val lad = List(('a', 1), ('d', 1), ('l', 1))
     assert(subtract(lard, r) === lad)
+  }
+  
+  test("subtract: lard - rd") {
+    new TestSets {
+    val rd = List(('r', 1),('d', 1))
+    assert(subtract(lard, rd)  === List(('a', 1),('l', 1)))
+    }
+  }
+  
+  test("subtract: larda - ra") {
+    new TestSets {
+    val ar = List(('a', 1),('r', 1))
+    
+    assert(subtract(larda, ar) === lad)
+    }
+  }
+  
+  test("subtract: a - a") {
+    val a1 = List(('a', 1))
+    val a2 = List(('a', 1))
+    
+    assert(subtract(a1, a2) === List())
   }
 
   test("sentence anagrams: []") {

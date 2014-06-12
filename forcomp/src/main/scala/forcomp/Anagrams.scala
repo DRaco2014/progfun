@@ -10,6 +10,8 @@ object Anagrams {
   /** A sentence is a `List` of words. */
   type Sentence = List[Word]
 
+  val zero: List[(Char, Int)] = List()
+
   /**
    * `Occurrences` is a `List` of pairs of characters and positive integers saying
    *  how often the character appears.
@@ -99,27 +101,26 @@ object Anagrams {
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
     case Nil => List(Nil)
-    case x :: xs => mergeAndCombine(generateSimple(x), combinations(xs)) 
+    case x :: xs => mergeAndCombine(generateSimple(x), combinations(xs))
   }
-  
+
   /**
    * generates 'simple' List of single letter combination up to number of occurrences
-   * */
+   */
   def generateSimple(occurence: (Char, Int)): List[List[(Char, Int)]] = {
     (for {
       i <- (1 to occurence._2)
     } yield List((occurence._1, i))).toList ++ List(Nil)
   }
-  
- 
+
   /**
-   * merges two lists of lists of (Char,Int) by concatenating eachs of elements from ListA with each of elements from listB   
-   * */
-  def mergeAndCombine(listA: List[List[(Char,Int)]],listB: List[List[(Char,Int)]]): List[List[(Char,Int)]]= {
+   * merges two lists of lists of (Char, Int) by concatenating each of elements from ListA with each of elements from listB
+   */
+  def mergeAndCombine(listA: List[List[(Char, Int)]], listB: List[List[(Char, Int)]]): List[List[(Char, Int)]] = {
     for {
-      b: List[(Char,Int)] <- listB
-      a: List[(Char,Int)] <- listA
-    } yield (b ++ a).sorted 
+      b: List[(Char, Int)] <- listB
+      a: List[(Char, Int)] <- listA
+    } yield (b ++ a).sorted
   }
 
   /**
@@ -133,7 +134,28 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+
+    /**
+     * should remove one tuple c if it exists in y list
+     * */
+    def subito(acc: Occurrences, c: (Char, Int)): Occurrences = y match {
+    case Nil => x
+    case _ => {
+      val mapY = y.toMap
+      if(mapY contains c._1){
+        val a: Int = mapY.get(c._1) match { case None => -1 case Some(x) => x}
+        if (c._2 > a) acc ++ List((c._1,c._2-1)) else acc 
+      } else {
+        acc ++ List(c)
+      }
+    }
+    }
+    
+    x.foldLeft(zero)(subito)
+  }
+
+  
 
   /**
    * Returns a list of all anagram sentences of the given sentence.

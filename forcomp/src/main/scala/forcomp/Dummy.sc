@@ -90,5 +90,31 @@ merge(ab,c).toSet                                 //> res7: scala.collection.imm
                                                   //| List((a,1)), List((b,1)), List((a,1), (b,1)), List(), List((c,1), (b,1)), L
                                                   //| ist((c,1), (a,1)), List((c,1), (a,1), (b,1)))
 
+var zero : List[Char] = List()                    //> zero  : List[Char] = List()
 
+def removeDuplicates(list: List[Char]) : List[Char] = list match{
+	case Nil => Nil
+	case x::xs => list.foldLeft(zero)( (r,c) => if(!r.contains(c)) r::: List(c) else r)
+	
+}                                                 //> removeDuplicates: (list: List[Char])List[Char]
+
+	val list : List[Char] = List('a','b','a') //> list  : List[Char] = List(a, b, a)
+	removeDuplicates(list)                    //> res8: List[Char] = List(a, b)
+	
+	def subtract(listA: List[Char], listB: List[Char]) : List[Char] = listA match{
+	case Nil => Nil
+	case x::xs => listA.foldLeft(zero)( (r,c) => if(listB.contains(c)) r else r ++ List(c))
+	
+}                                                 //> subtract: (listA: List[Char], listB: List[Char])List[Char]
+
+	val listA = List('a','b')                 //> listA  : List[Char] = List(a, b)
+	val listB = List('b')                     //> listB  : List[Char] = List(b)
+subtract(listA, listB)                            //> res9: List[Char] = List(a)
+
+
+val listC: List[(Char,Int)] = List(('a',2),('b',1))
+                                                  //> listC  : List[(Char, Int)] = List((a,2), (b,1))
+
+	listC.toMap contains 'a'                  //> res10: Boolean = true
+	listC.toMap.get('a')                      //> res11: Option[Int] = Some(2)
 }
