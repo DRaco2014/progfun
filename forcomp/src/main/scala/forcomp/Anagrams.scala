@@ -99,42 +99,28 @@ object Anagrams {
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
     case Nil => List(Nil)
-    case _ => {
-      val simples: List[(Char, Int)] = List() ++ generateSimples(occurrences)
-      (simples.map(x => List(x)) ++ combine(simples) ++ List(Nil))
-      }    
+    case x :: xs => {
+      mergeAndCombine(generateSimples(x), combinations(xs))
+    }
   }
-  
-  
-  private def generateSimples(occurences: List[(Char, Int)]): List[(Char, Int)] = {
-    for {
-      (k, occ) <- occurences
-      i <- 1 to occ
-    } yield (k, i)    
+
+  def generateSimples(occ: (Char, Int)): List[Occurrences] = {
+    (for {
+      i <- 1 to occ._2
+    } yield List((occ._1, i))).toList ++ List(Nil)
   }
-  
-  private def generateSimple(occurence: (Char, Int)): List[(Char, Int)] = {
-    (for {      
-      i <- (1 to occurence._2)
-    } yield (occurence._1, i)).toList    
-  }
-  
-  def combine(occurences: List[(Char, Int)]): List[List[(Char, Int)]] = {
-    for {
-      (k, occ) <- occurences
-      (l, occ2) <- occurences
-      if k < l
-    } yield List((k, occ),(l, occ2))
-  }
-  
+
   /**
-   * merges two lists of lists of (Char,Int) by concatenating them and adding combinations of elements from ListA with elements from listB   
-   * */
-  def merge(listA: List[List[(Char,Int)]],listB: List[List[(Char,Int)]]): List[List[(Char,Int)]] = listA match{
-  	case Nil => listB ++ List(Nil)
-  	case x :: Nil => listB.map(y => y ++ x) ++ listB ++ List(x) ++ List(Nil)
-  	case x :: xs => listB.map(y => y ++ x) ++ merge(xs, listB)++ listB ++ List(x) ++ List(Nil)
-  }    
+   * merges two lists of lists of (Char,Int) by concatenating them and adding combinations of elements from ListA with elements from listB
+   */
+  def mergeAndCombine(listA: List[Occurrences], listB: List[Occurrences]): List[Occurrences] = {
+    for {
+      x <- listA
+      y <- listB
+    } yield (x ++ y).sorted
+  }
+
+  val zero: List[(Char, Int)] = List()
 
   /**
    * Subtracts occurrence list `y` from occurrence list `x`.
@@ -147,7 +133,18 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = ???
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+    def subito(acc: Occurrences, c: (Char, Int)): Occurrences = {
+      val mapY = y.toMap
+      if (mapY contains c._1) {
+        val occY = mapY.get(c._1) match { case None => -1 case Some(a) => a }
+        if (c._2 > occY) acc ++ List((c._1, c._2 - occY)) //c is in y and it's occurrence is smaller than in x 
+        else acc //c is in y and should be removed.
+      } else acc ++ List(c) //c is not in y
+    }
+
+    x.foldLeft(zero)(subito)
+  }
 
   /**
    * Returns a list of all anagram sentences of the given sentence.
@@ -190,6 +187,30 @@ object Anagrams {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+
+    def sentAna(sentOcc: Occurrences): List[Sentence] = {
+      for {
+          x <- combinations(sentOcc)
+          if ((dictionaryByOccurrences contains x))
+        } yield {
+          dictionaryByOccurrences.get(x) match {
+            case Some(y) => y
+            case None => Nil
+          }
+        }
+    }
+
+    sentence match {
+      case Nil => List(Nil)
+      case _ => {
+        for {
+          x <- combinations(sentenceOccurrences(sentence))
+          word <- dictionaryByOccurrences.get(x)
+           if ((dictionaryByOccurrences contains x))
+        } yield word
+      }
+    }
+  }
 
 }

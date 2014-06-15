@@ -16,7 +16,6 @@ object Dummy {
   }                                               //> generateSimples: (occurences3: List[(Char, Int)])List[List[(Char, Int)]]
 
   generateSimples(abc)                            //> res0: List[List[(Char, Int)]] = List(List((a,1)), List((b,1)), List((c,1)))
-                                                  //| 
 
   def generateSimple(occurence: (Char, Int)): List[List[(Char, Int)]] = {
     (for {
@@ -88,6 +87,9 @@ val c= List(List(('c',1)))                        //> c  : List[List[(Char, Int)
 merge(ab,c).toSet                                 //> res6: scala.collection.immutable.Set[List[(Char, Int)]] = Set(List((c,1)), 
                                                   //| List((a,1)), List((b,1)), List((a,1), (b,1)), List(), List((c,1), (b,1)), L
                                                   //| ist((c,1), (a,1)), List((c,1), (a,1), (b,1)))
+
+
+
 
 
 }
