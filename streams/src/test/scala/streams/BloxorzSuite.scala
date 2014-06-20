@@ -43,9 +43,16 @@ class BloxorzSuite extends FunSuite {
   test("terrain function level 1") {
     new Level1 {
       assert(terrain(Pos(0,0)), "0,0")
-      assert(!terrain(Pos(4,11)), "4,11")
+      assert(!terrain(Pos(-1,0)), "should detect invalid pos (-1,0)")
+      assert(!terrain(Pos(-1,-1)), "should detect invalid pos (-1,-1)")
+      assert(!terrain(Pos(1,-2)), "should detect invalid pos (1,-2)")
+      assert(!terrain(Pos(4,11)), "y out of bounds (4,11)")
+      assert(!terrain(Pos(7,5)), "x out of bounds (7,5)")
+      assert(!terrain(Pos(7,11)), "both out of bounds (7,11)")
     }
   }
+  
+  
 
   test("findChar level 1") {
     new Level1 {
