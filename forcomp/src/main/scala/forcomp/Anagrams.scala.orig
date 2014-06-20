@@ -10,8 +10,6 @@ object Anagrams {
   /** A sentence is a `List` of words. */
   type Sentence = List[Word]
 
-  val zero: List[(Char, Int)] = List()
-
   /**
    * `Occurrences` is a `List` of pairs of characters and positive integers saying
    *  how often the character appears.
@@ -101,7 +99,8 @@ object Anagrams {
    */
   def combinations(occurrences: Occurrences): List[Occurrences] = occurrences match {
     case Nil => List(Nil)
-    case x :: xs => mergeAndCombine(generateSimple(x), combinations(xs))  }
+    case x :: xs => mergeAndCombine(generateSimple(x), combinations(xs))
+  }
 
   /**
    * generates 'simple' List of single letter combination up to number of occurrences
@@ -119,7 +118,10 @@ object Anagrams {
     for {
       b: List[(Char, Int)] <- listB
       a: List[(Char, Int)] <- listA
-    } yield (b ++ a).sorted  }
+    } yield (b ++ a).sorted
+  }
+
+  val zero: List[(Char, Int)] = List()
 
   /**
    * Subtracts occurrence list `y` from occurrence list `x`.
@@ -132,24 +134,24 @@ object Anagrams {
    *  Note: the resulting value is an occurrence - meaning it is sorted
    *  and has no zero-entries.
    */
-  def subtract(x: Occurrences, y: Occurrences): Occurrences = {    /**
+  def subtract(x: Occurrences, y: Occurrences): Occurrences = {
+
+    /**
      * should remove one tuple c if it exists in y list
      * */
-    def subito(acc: Occurrences, c: (Char, Int)): Occurrences = y match {
-    case Nil => x
-    case _ => {
+    def subito(acc: Occurrences, c: (Char, Int)): Occurrences = {
       val mapY = y.toMap
-      if(mapY contains c._1){
-        val a: Int = mapY.get(c._1) match { case None => -1 case Some(x) => x}
-        if (c._2 > a) acc ++ List((c._1,c._2-1)) else acc 
-      } else {
-        acc ++ List(c)
-      }
+      if (mapY contains c._1) {
+        val occY = mapY.get(c._1) match { case None => -1 case Some(a) => a }
+        if (c._2 > occY) acc ++ List((c._1, c._2 - occY)) //c is in y and it's occurrence is smaller than in x 
+        else acc //c is in y and should be removed.
+      } else acc ++ List(c) //c is not in y
     }
-    }
-    
+
     x.foldLeft(zero)(subito)
-  }  /**
+  }
+
+  /**
    * Returns a list of all anagram sentences of the given sentence.
    *
    *  An anagram of a sentence is formed by taking the occurrences of all the characters of

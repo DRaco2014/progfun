@@ -86,20 +86,24 @@ class AnagramsSuite extends FunSuite {
   }
 
   test("combinations: abc") {
+
     new TestSets {
       assert(combinations(abc).toSet === abccomb.toSet)
     }
   }
+
   test("reflexive merge and combine: ab ++ c == c ++ ab") {
     new TestSets {
       assert(mergeAndCombine(ab, c).toSet === mergeAndCombine(c, ab).toSet)
     }
-  }  
+  }
+  
   test("merge and combine: ab ++ c") {
     new TestSets {
       assert(mergeAndCombine(ab, c).toSet === abccomb.toSet)
     }
   }
+
   test("subtract: lard - r") {
     val lard = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
     val r = List(('r', 1))
@@ -127,6 +131,12 @@ class AnagramsSuite extends FunSuite {
     val a2 = List(('a', 1))
     
     assert(subtract(a1, a2) === List())
+  }
+
+
+  test("subtract: lard - lard") {
+    val lard = List(('a', 1), ('d', 1), ('l', 1), ('r', 1))
+    assert(subtract(lard, lard) === List())
   }
 
   test("sentence anagrams: []") {
@@ -166,5 +176,6 @@ class AnagramsSuite extends FunSuite {
     List("Abba")    
     )
     assert(sentenceAnagrams(sentence).toSet === res.toSet)
-}
+  }
+
 }

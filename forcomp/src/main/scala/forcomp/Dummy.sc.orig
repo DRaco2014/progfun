@@ -8,22 +8,14 @@ object Dummy {
                                                   //> occurences  : List[(Char, Int)] = List((a,2), (b,2), (c,2))
   val abc = List(('a', 2), ('b', 3), ('c', 1))    //> abc  : List[(Char, Int)] = List((a,2), (b,3), (c,1))
 
-  def generateSimples(occurences3: List[(Char, Int)]): List[List[(Char, Int)]] = {
-    (for {
-      (k, occ) <- occurences3
-      i <- 1 to occ
-    } yield List((k, i)) ) ++ List(Nil)
-  }                                               //> generateSimples: (occurences3: List[(Char, Int)])List[List[(Char, Int)]]
-
-  generateSimples(abc)                            //> res0: List[List[(Char, Int)]] = List(List((a,1)), List((b,1)), List((c,1)))
 
   def generateSimple(occurence: (Char, Int)): List[List[(Char, Int)]] = {
     (for {
       i <- (1 to occurence._2)
-    } yield List((occurence._1, i))).toList
+    } yield List((occurence._1, i))).toList ++ List(Nil)
   }                                               //> generateSimple: (occurence: (Char, Int))List[List[(Char, Int)]]
 
-  generateSimple(('a', 2))                        //> res1: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)))
+  generateSimple(('a', 2))                        //> res0: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)), List())
 
   def combine(occurences4: List[(Char, Int)]): List[List[(Char, Int)]] = {
     for {
@@ -33,8 +25,8 @@ object Dummy {
     } yield List((k, occ), (l, occ2))
   }                                               //> combine: (occurences4: List[(Char, Int)])List[List[(Char, Int)]]
 
-  combine(abc)                                    //> res2: List[List[(Char, Int)]] = List(List((a,1), (b,1)), List((a,1), (c,1)),
-                                                  //|  List((b,1), (c,1)))
+  combine(abc)                                    //> res1: List[List[(Char, Int)]] = List(List((a,2), (b,3)), List((a,2), (c,1)),
+                                                  //|  List((b,3), (c,1)))
 
   def simpleC(occurences: List[(Char, Int)]): List[(Char, Int)] = {
     for {
@@ -42,7 +34,7 @@ object Dummy {
       i <- 1 to occ
     } yield (k, i)
   }                                               //> simpleC: (occurences: List[(Char, Int)])List[(Char, Int)]
-  simpleC(occurences)                             //> res3: List[(Char, Int)] = List((a,1), (a,2), (b,1), (b,2), (c,1), (c,2))
+  simpleC(occurences)                             //> res2: List[(Char, Int)] = List((a,1), (a,2), (b,1), (b,2), (c,1), (c,2))
 
   def comb(occurrences2: List[(Char, Int)]): List[List[(Char, Int)]] = {
     val zero = List(Nil)
@@ -55,8 +47,8 @@ object Dummy {
     }
   }                                               //> comb: (occurrences2: List[(Char, Int)])List[List[(Char, Int)]]
 
-  comb(abc)                                       //> res4: List[List[(Char, Int)]] = List(List((a,1)), List((b,1)), List((c,1)),
-                                                  //|  List())
+  comb(abc)                                       //> res3: List[List[(Char, Int)]] = List(List((a,1)), List((a,2)), List(), List
+                                                  //| ((b,1)), List((b,2)), List((b,3)), List(), List((c,1)), List(), List())
 
   def secondC(occurences: List[(Char, Int)]): List[List[(Char, Int)]] = {
     for {
@@ -66,7 +58,7 @@ object Dummy {
     } yield List((k, occ), (l, occ2))
   }                                               //> secondC: (occurences: List[(Char, Int)])List[List[(Char, Int)]]
 
-  secondC(simpleC(occurences))                    //> res5: List[List[(Char, Int)]] = List(List((a,1), (b,1)), List((a,1), (b,2))
+  secondC(simpleC(occurences))                    //> res4: List[List[(Char, Int)]] = List(List((a,1), (b,1)), List((a,1), (b,2))
                                                   //| , List((a,1), (c,1)), List((a,1), (c,2)), List((a,2), (b,1)), List((a,2), (
                                                   //| b,2)), List((a,2), (c,1)), List((a,2), (c,2)), List((b,1), (c,1)), List((b,
                                                   //| 1), (c,2)), List((b,2), (c,1)), List((b,2), (c,2)))
@@ -84,10 +76,37 @@ val ab = List(List(('a',1)),List(('b',1)),List(('a',1),('b',1)))
                                                   //| (b,1)))
 val c= List(List(('c',1)))                        //> c  : List[List[(Char, Int)]] = List(List((c,1)))
 
-merge(ab,c).toSet                                 //> res6: scala.collection.immutable.Set[List[(Char, Int)]] = Set(List((c,1)), 
+merge(ab,c).toSet                                 //> res5: scala.collection.immutable.Set[List[(Char, Int)]] = Set(List((c,1)), 
                                                   //| List((a,1)), List((b,1)), List((a,1), (b,1)), List(), List((c,1), (b,1)), L
                                                   //| ist((c,1), (a,1)), List((c,1), (a,1), (b,1)))
 
+var zero : List[Char] = List()                    //> zero  : List[Char] = List()
+
+def removeDuplicates(list: List[Char]) : List[Char] = list match{
+	case Nil => Nil
+	case x::xs => list.foldLeft(zero)( (r,c) => if(!r.contains(c)) r::: List(c) else r)
+	
+}                                                 //> removeDuplicates: (list: List[Char])List[Char]
+
+	val list : List[Char] = List('a','b','a') //> list  : List[Char] = List(a, b, a)
+	removeDuplicates(list)                    //> res6: List[Char] = List(a, b)
+	
+	def subtract(listA: List[Char], listB: List[Char]) : List[Char] = listA match{
+	case Nil => Nil
+	case x::xs => listA.foldLeft(zero)( (r,c) => if(listB.contains(c)) r else r ++ List(c))
+	
+}                                                 //> subtract: (listA: List[Char], listB: List[Char])List[Char]
+
+	val listA = List('a','b')                 //> listA  : List[Char] = List(a, b)
+	val listB = List('b')                     //> listB  : List[Char] = List(b)
+subtract(listA, listB)                            //> res7: List[Char] = List(a)
+
+
+val listC: List[(Char,Int)] = List(('a',2),('b',1))
+                                                  //> listC  : List[(Char, Int)] = List((a,2), (b,1))
+
+	listC.toMap contains 'a'                  //> res8: Boolean = true
+	listC.toMap.get('a')                      //> res9: Option[Int] = Some(2)
 
 
 
