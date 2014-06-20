@@ -41,8 +41,9 @@ class BloxorzSuite extends FunSuite {
   }
 
   test("terrain function level 1") {
-    new Level1 {
+    new Level1 {      
       assert(terrain(Pos(0,0)), "0,0")
+      assert(!terrain(Pos(3,0)), "3,0")
       assert(!terrain(Pos(-1,0)), "should detect invalid pos (-1,0)")
       assert(!terrain(Pos(-1,-1)), "should detect invalid pos (-1,-1)")
       assert(!terrain(Pos(1,-2)), "should detect invalid pos (1,-2)")
