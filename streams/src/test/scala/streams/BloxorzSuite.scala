@@ -27,6 +27,16 @@ class BloxorzSuite extends FunSuite {
       }
   }
 
+  trait LevelA extends SolutionChecker {
+    val level =
+      """ST
+      |oo
+      |oo""".stripMargin
+
+    val stB = Block(Pos(0, 0), Pos(0, 0))
+    val initial  = Stream((stB, List()))
+  }
+
   trait Level1 extends SolutionChecker {
     /* terrain for level 1*/
 
@@ -96,7 +106,20 @@ class BloxorzSuite extends FunSuite {
           (Block(Pos(2, 1), Pos(3, 1)), List(Down, Left, Up))).toStream,
 
         Set(Block(Pos(1, 2), Pos(1, 3)), Block(Pos(1, 1), Pos(1, 1))))
-        assert(test == res)
+      assert(test == res)
+    }
+  }
+
+
+
+  test("from on a trivial level") {
+    new LevelA {
+      val res = from(initial, Set())
+      assert(res == Stream(
+        (Block(Pos(0, 0), Pos(0, 0)), List()),
+        (Block(Pos(1, 0), Pos(2, 0)), List(Down)),
+        (Block(Pos(1, 1), Pos(2, 1)), List(Right, Down)),
+        (Block(Pos(0, 1), Pos(0, 1)), List(Up, Right, Down))))
     }
   }
 
