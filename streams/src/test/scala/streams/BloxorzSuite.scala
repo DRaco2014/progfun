@@ -33,8 +33,16 @@ class BloxorzSuite extends FunSuite {
       |oo
       |oo""".stripMargin
 
-    val stB = Block(Pos(0, 0), Pos(0, 0))
-    val initial  = Stream((stB, List()))
+    val initialStream  = Stream((startBlock, List()))
+  }
+  
+  trait LevelB extends SolutionChecker {
+    val level =
+      """SoT
+      |ooo
+      |oo-""".stripMargin
+
+    val initial  = Stream((startBlock, List()))
   }
 
   trait Level1 extends SolutionChecker {
@@ -49,7 +57,6 @@ class BloxorzSuite extends FunSuite {
       |------ooo-""".stripMargin
 
     val optsolution = List(Right, Right, Down, Right, Right, Right, Down)
-    val sBlock = Block(startPos, startPos)
     val terra = Vector(level.split("\n").map(str => Vector(str: _*)): _*)
   }
 
@@ -75,13 +82,13 @@ class BloxorzSuite extends FunSuite {
 
   test("neighbors of startPos") {
     new Level1 {
-      assert(sBlock.neighbors.toSet == List((Block(Pos(-1, 1), Pos(0, 1)), Up), (Block(Pos(1, 2), Pos(1, 3)), Right), (Block(Pos(2, 1), Pos(3, 1)), Down), (Block(Pos(1, -1), Pos(1, 0)), Left)).toSet, "invalid neighbors")
+      assert(startBlock.neighbors.toSet == List((Block(Pos(-1, 1), Pos(0, 1)), Up), (Block(Pos(1, 2), Pos(1, 3)), Right), (Block(Pos(2, 1), Pos(3, 1)), Down), (Block(Pos(1, -1), Pos(1, 0)), Left)).toSet, "invalid neighbors")
     }
   }
 
   test("legal neighbors of startPos") {
     new Level1 {
-      assert(sBlock.legalNeighbors.toSet == List((Block(Pos(1, 2), Pos(1, 3)), Right), (Block(Pos(2, 1), Pos(3, 1)), Down)).toSet, "only right and down are legal")
+      assert(startBlock.legalNeighbors.toSet == List((Block(Pos(1, 2), Pos(1, 3)), Right), (Block(Pos(2, 1), Pos(3, 1)), Down)).toSet, "only right and down are legal")
     }
   }
 
@@ -111,15 +118,36 @@ class BloxorzSuite extends FunSuite {
   }
 
 
+  	test("from on level without solution") {
+    new LevelB {
+      val res = Stream(
+          (Block(Pos(0,0),Pos(0,0)),List()), 
+          (Block(Pos(0,1),Pos(0,2)),List(Right)), 
+          (Block(Pos(1,0),Pos(2,0)),List(Down)), 
+          (Block(Pos(1,1),Pos(1,2)),List(Down, Right)), 
+          (Block(Pos(1,1),Pos(2,1)),List(Right, Down)), 
+          (Block(Pos(1,0),Pos(1,0)),List(Left, Down, Right)), 
+          (Block(Pos(0,1),Pos(0,1)),List(Up, Right, Down)))
+      assert(from(Stream((startBlock,List())),Set(startBlock))== res)
+      }
+    }
+  
 
   test("from on a trivial level") {
     new LevelA {
-      val res = from(initial, Set())
+      val res = from(initialStream, Set(startBlock))
       assert(res == Stream(
         (Block(Pos(0, 0), Pos(0, 0)), List()),
         (Block(Pos(1, 0), Pos(2, 0)), List(Down)),
         (Block(Pos(1, 1), Pos(2, 1)), List(Right, Down)),
         (Block(Pos(0, 1), Pos(0, 1)), List(Up, Right, Down))))
+    }
+  }
+  
+  
+  test("solution on a trivial level") {
+    new LevelA {
+      assert(solution== List(Up, Right, Down).reverse)
     }
   }
 

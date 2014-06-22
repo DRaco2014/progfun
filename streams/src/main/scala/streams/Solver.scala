@@ -39,7 +39,7 @@ trait Solver extends GameDef {
    * make sure that we don't explore circular paths.
    */
   def newNeighborsOnly(neighbors: Stream[(Block, List[Move])],
-    explored: Set[Block]): Stream[(Block, List[Move])] = neighbors filterNot {case (b,_) => explored contains b}
+    explored: Set[Block]): Stream[(Block, List[Move])] = neighbors filterNot { case (b, _) => explored contains b }
 
   /**
    * The function `from` returns the stream of all possible paths
@@ -65,26 +65,34 @@ trait Solver extends GameDef {
    * construct the correctly sorted stream.
    */
   def from(initial: Stream[(Block, List[Move])],
-    explored: Set[Block]): Stream[(Block, List[Move])] = initial match {
-    case Stream() => Stream()
-    case x #:: _ => {
+    explored: Set[Block]): Stream[(Block, List[Move])] = {
+    if (initial.isEmpty) Stream()
+    else {
       val more = for {
-      next <- newNeighborsOnly(neighborsWithHistory(x._1,x._2),explored)      
+        path <- initial
+        next <- newNeighborsOnly(neighborsWithHistory(path._1, path._2), explored)
       } yield next
-      x #:: from(more, explored + x._1)
+      initial #::: from(more, explored ++ (more map (_._1)))
     }
   }
 
   /**
    * The stream of all paths that begin at the starting block.
    */
-  lazy val pathsFromStart: Stream[(Block, List[Move])] = ???
+  lazy val pathsFromStart: Stream[(Block, List[Move])] = from(Stream((Block(startPos, startPos), List())), Set(Block(startPos, startPos)))
 
   /**
    * Returns a stream of all possible pairs of the goal block along
    * with the history how it was reached.
    */
-  lazy val pathsToGoal: Stream[(Block, List[Move])] = ???
+  lazy val pathsToGoal: Stream[(Block, List[Move])] = {
+    for {
+      path <- pathsFromStart
+      if (done(path._1))
+    } yield {
+      path
+    }
+  }
 
   /**
    * The (or one of the) shortest sequence(s) of moves to reach the
@@ -94,5 +102,5 @@ trait Solver extends GameDef {
    * the first move that the player should perform from the starting
    * position.
    */
-  lazy val solution: List[Move] = ???
+  lazy val solution: List[Move] = if(pathsToGoal.isEmpty) Nil else pathsToGoal.head._2.reverse
 }
